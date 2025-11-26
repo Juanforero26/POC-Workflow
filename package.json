@@ -1,0 +1,21 @@
+{
+  "name": "dynatrace-lookup-upload",
+  "version": "1.0.0",
+  "description": "Upload lookup data to Dynatrace Grail Resource Store",
+  "main": "dynatrace-lookup-upload.js",
+  "scripts": {
+    "start": "node dynatrace-lookup-upload.js"
+  },
+  "keywords": [
+    "dynatrace",
+    "grail",
+    "lookup",
+    "upload"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "form-data": "^4.0.0"
+  }
+}
+

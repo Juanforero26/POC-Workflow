@@ -1,0 +1,57 @@
+name: Trigger Dynatrace Workflow
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    # Uncomment the line below if you want to trigger on all branches
+    # branches-ignore: []
+  # Uncomment if you want to trigger on pull requests
+  # pull_request:
+  #   branches:
+  #     - main
+  #     - master
+
+jobs:
+  trigger-dynatrace:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Trigger Dynatrace Workflow
+        id: trigger
+        run: |
+          response=$(curl -s -w "\n%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.DYNATRACE_BEARER_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -X POST \
+            https://nzi70060.sprint.apps.dynatracelabs.com/platform/automation/v1/workflows/70740001-1420-400d-bb00-49fed3a454cb/run)
+          
+          # Extract HTTP status code (last line)
+          http_code=$(echo "$response" | tail -n1)
+          # Extract response body (all but last line)
+          body=$(echo "$response" | sed '$d')
+          
+          echo "HTTP Status: $http_code"
+          echo "Response: $body"
+          
+          if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+            echo "✅ Dynatrace workflow triggered successfully"
+            echo "status=success" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Failed to trigger Dynatrace workflow"
+            echo "status=failure" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      - name: Display result
+        if: always()
+        run: |
+          if [ "${{ steps.trigger.outputs.status }}" == "success" ]; then
+            echo "✅ Workflow execution completed successfully"
+          else
+            echo "❌ Workflow execution failed"
+          fi
+
