@@ -12,9 +12,13 @@ export default async function () {
     // NOTE: API_TOKEN and DT_URL should be configured in your Dynatrace workflow settings
     // or passed as workflow inputs. Do not hardcode secrets in the code.
     const DT_URL = process.env.DT_URL || 'https://nzi70060.sprint.apps.dynatracelabs.com';
-    const API_TOKEN = process.env.DT_API_TOKEN || ''; // Should be set via workflow configuration
+    const tokenCredentials: CredentialsDetailsTokenResponseElement =
+    await credentialVaultClient.getCredentialsDetails({
+        id: 'CREDENTIALS_VAULT-4CAA8C8350C3FF4A',
+      });
     
-    if (!API_TOKEN) {
+    
+    if (!tokenCredentials) {
         throw new Error('API_TOKEN is required. Please configure it in your Dynatrace workflow settings.');
     }
     
@@ -87,7 +91,7 @@ export default async function () {
         const response = await fetch(ENDPOINT_URL, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${API_TOKEN}`,
+                'Authorization': `Bearer ${tokenCredentials.token}`,
                 'accept': '*/*'
                 // DO NOT set Content-Type - fetch will set it automatically with boundary
             },
