@@ -31,7 +31,7 @@ export default async function () {
         ? lookupJsonPayloadRaw.content 
         : (typeof lookupJsonPayloadRaw === 'string' ? lookupJsonPayloadRaw : JSON.stringify(lookupJsonPayloadRaw));
     
-    const csvContentString = (csvContentRaw && csvContentRaw.content) 
+    let csvContentString = (csvContentRaw && csvContentRaw.content) 
         ? csvContentRaw.content 
         : (typeof csvContentRaw === 'string' ? csvContentRaw : String(csvContentRaw));
 
@@ -40,7 +40,7 @@ export default async function () {
     console.log('lookupJsonPayloadRaw type:', typeof lookupJsonPayloadRaw);
     console.log('lookupJsonPayloadString preview:', lookupJsonPayloadString.substring(0, 200));
     console.log('csvContentString length:', csvContentString.length);
-    console.log('csvContentString preview:', csvContentString.substring(0, 200));
+    console.log('csvContentString preview (first 200 chars):', csvContentString.substring(0, 200));
 
     // API endpoint - using the correct Resource Store API endpoint
     const API_PATH = '/platform/storage/resource-store/v1/files/tabular/lookup:upload';
@@ -54,6 +54,21 @@ export default async function () {
     } catch (e) {
         console.error('Failed to parse JSON:', e);
         throw new Error(`Invalid JSON payload from retrieve-payload task: ${e.message}`);
+    }
+    
+    // Remove header row from CSV if skippedRecords > 0
+    // This ensures headers aren't ingested even if the API parameter doesn't work as expected
+    // We do this BEFORE sending to ensure the CSV order is preserved
+    if (requestParams.skippedRecords > 0) {
+        const lines = csvContentString.split('\n').filter(line => line.trim() !== ''); // Remove empty lines
+        if (lines.length > requestParams.skippedRecords) {
+            // Remove the first N lines (header rows) and preserve order
+            csvContentString = lines.slice(requestParams.skippedRecords).join('\n');
+            console.log(`Removed ${requestParams.skippedRecords} header row(s) from CSV. Remaining lines: ${lines.length - requestParams.skippedRecords}`);
+            console.log('CSV after header removal (first 200 chars):', csvContentString.substring(0, 200));
+        } else {
+            console.warn(`Warning: CSV has ${lines.length} lines but skippedRecords is ${requestParams.skippedRecords}`);
+        }
     }
     
     // Validate required fields

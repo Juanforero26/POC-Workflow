@@ -3,10 +3,10 @@
   "filePath": "/lookups/status/training_attendance",
   "overwrite": true,
   "displayName": "Training Session Attendance",
-  "skippedRecords": 0,
+  "skippedRecords": 1,
   "autoFlatten": true,
   "timezone": "UTC",
   "locale": "en_US",
   "description": "Attendance Record for Dynatrace Training Sessions",
-  "parsePattern": "LD:id ',' LD:name ','LD:session_date',' LD:session"
+  "parsePattern": "LD:id ',' LD:name ',' LD:session_date ',' LD:session"
 }
