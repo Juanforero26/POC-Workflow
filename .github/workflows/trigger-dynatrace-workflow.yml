@@ -5,13 +5,11 @@ on:
     branches:
       - main
       - master
-    # Uncomment the line below if you want to trigger on all branches
-    # branches-ignore: []
-  # Uncomment if you want to trigger on pull requests
-  # pull_request:
-  #   branches:
-  #     - main
-  #     - master
+    paths:
+      - '*.csv'
+      - '**/*.csv'
+    # Only trigger when CSV files are changed
+    # This allows you to update code/docs without triggering the workflow
 
 jobs:
   trigger-dynatrace:

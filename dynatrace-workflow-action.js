@@ -1,4 +1,8 @@
 import { result } from '@dynatrace-sdk/automation-utils';
+import {
+    credentialVaultClient,
+    CredentialsDetailsTokenResponseElement,
+  } from '@dynatrace-sdk/client-classic-environment-v2';
 
 /**
  * Dynatrace Workflow Action: Upload Lookup Data
@@ -12,10 +16,9 @@ export default async function () {
     // NOTE: API_TOKEN and DT_URL should be configured in your Dynatrace workflow settings
     // or passed as workflow inputs. Do not hardcode secrets in the code.
     const DT_URL = process.env.DT_URL || 'https://nzi70060.sprint.apps.dynatracelabs.com';
-    const tokenCredentials: CredentialsDetailsTokenResponseElement =
-    await credentialVaultClient.getCredentialsDetails({
+    const tokenCredentials = await credentialVaultClient.getCredentialsDetails({
         id: 'CREDENTIALS_VAULT-4CAA8C8350C3FF4A',
-      });
+    });
     
     
     if (!tokenCredentials) {
@@ -87,6 +90,23 @@ export default async function () {
     if (!requestParams.parsePattern || requestParams.parsePattern.trim() === '') {
         throw new Error('parsePattern is required and must not be blank in the request payload');
     }
+
+    // Add current date to description dynamically
+    const currentDate = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    const dateFormatted = new Date().toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    }); // Format: "January 1, 2025"
+    
+    // Update description with date
+    if (requestParams.description) {
+        requestParams.description = `${requestParams.description} on ${dateFormatted}`;
+    } else {
+        requestParams.description = `Uploaded on ${dateFormatted}`;
+    }
+    
+    console.log('Updated description:', requestParams.description);
 
     // Convert back to JSON string for the form data
     const requestPayload = JSON.stringify(requestParams);
