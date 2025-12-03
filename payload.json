@@ -8,5 +8,5 @@
   "timezone": "UTC",
   "locale": "en_US",
   "description": "Attendance Record for Dynatrace Training Sessions",
-  "parsePattern": "LD:id ',' LD:name ','LD:session_date'',' LD:session"
+  "parsePattern": "LD:id ',' LD:name ','LD:session_date',' LD:session"
 }
