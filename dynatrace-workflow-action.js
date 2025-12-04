@@ -147,6 +147,7 @@ export default async function () {
             return {
                 message: `Successfully uploaded lookup data. Status: ${response.status}`,
                 statusCode: response.status,
+                filePath: requestParams.filePath,
                 responseBody: responseBody
             };
         } else {
